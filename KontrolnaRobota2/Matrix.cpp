@@ -1,5 +1,6 @@
 #include "Matrix.h"
 #include <cmath>
+#include <iomanip>
 
 double Matrix::determinant(const Matrix& matrix, size_t size)
 {
@@ -93,4 +94,103 @@ double Matrix::det(const Matrix& m)
 		return m.elements[0][0];
 	}
 	return determinant(m, m.row);
+}
+
+Matrix Matrix::inv(const Matrix& m)
+{
+	return m;
+}
+
+Matrix Matrix::mult(const Matrix& m1, const Matrix& m2)
+{
+	if (m1.col != m2.row) throw std::invalid_argument("Invalid dimensions for matrix multiplication");
+	Matrix result(m1.row, m2.col);
+	for (size_t i = 0; i < m1.row; i++) {
+		for (size_t j = 0; j < m2.col; j++) {
+			for (size_t k = 0; k < m1.col; k++) {
+				result.elements[i][j] += m1.elements[i][k] * m2.elements[k][j];
+			}
+		}
+	}
+	return result;
+}
+
+Matrix Matrix::operator+(const Matrix& m)
+{
+	if (row != m.row || col != m.col) throw std::invalid_argument("Dimensions mismatch for addition");
+	Matrix result(row, col);
+	for (size_t i = 0; i < row; i++)
+		for (size_t j = 0; j < col; j++)
+			result.elements[i][j] = elements[i][j] + m.elements[i][j];
+	return result;
+}
+
+Matrix Matrix::operator-(const Matrix& m)
+{
+	if (row != m.row || col != m.col) throw std::invalid_argument("Dimensions mismatch for subtraction");
+	Matrix result(row, col);
+	for (size_t i = 0; i < row; i++)
+		for (size_t j = 0; j < col; j++)
+			result.elements[i][j] = elements[i][j] - m.elements[i][j];
+	return result;
+}
+
+Matrix Matrix::operator*(const Matrix& m)
+{
+	if (row != m.row || col != m.col) throw std::invalid_argument("Dimensions mismatch for multiplication");
+	Matrix result(row, col);
+	for (size_t i = 0; i < row; i++)
+		for (size_t j = 0; j < col; j++)
+			result.elements[i][j] = elements[i][j] * m.elements[i][j];
+	return result;
+}
+
+Matrix Matrix::operator/(const Matrix& m)
+{
+	if (row != m.row || col != m.col) throw std::invalid_argument("Dimensions mismatch for  division");
+	Matrix result(row, col);
+	for (size_t i = 0; i < row; i++) {
+		for (size_t j = 0; j < col; j++) {
+			if (m.elements[i][j] == 0) throw std::runtime_error("Division by zero");
+			result.elements[i][j] = elements[i][j] / m.elements[i][j];
+		}
+	}
+	return result;
+}
+
+double& Matrix::operator[](size_t ind)
+{
+	if (ind >= row * col) throw std::out_of_range("INdex out of range");
+	return elements[ind / col][ind % col];
+}
+
+const double& Matrix::operator[](size_t ind) const
+{
+	if (ind >= row * col) throw std::out_of_range("Index out of range");
+	return elements[ind / col][ind % col];
+}
+
+std::istream& operator>>(std::istream& in, Matrix& m)
+{
+	for (size_t i = 0; i < m.col; i++)
+	{
+		for (size_t j = 0; j < m.row; j++)
+		{
+			in >> m.elements[i][j];
+		}
+	}
+	return in;
+}
+
+std::ostream& operator<<(std::ostream& out, const Matrix& m)
+{
+	for (size_t i = 0; i < m.col; i++)
+	{
+		for (size_t j = 0; j < m.row; j++)
+		{
+			out << std::setw(5) << m.elements[i][j];
+		}
+		out << std::endl;
+	}
+	return out;
 }

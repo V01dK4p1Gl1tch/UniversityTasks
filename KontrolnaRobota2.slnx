@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="KontrolnaRobota2/KontrolnaRobota2.vcxproj" />
+  <Project Path="KontrolnaRobota2/KontrolnaRobota2.vcxproj" Id="152a913f-069d-4525-875f-bc70657a7935" />
 </Solution>
