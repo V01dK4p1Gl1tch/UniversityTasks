@@ -4,6 +4,7 @@
 
 double Matrix::determinant(const Matrix& matrix, size_t size)
 {
+	if (size == 1) return matrix.elements[0][0];
 	double d = 0;
 	Matrix sub_m(matrix.row, matrix.col);
 	if (size == 2) {
@@ -98,7 +99,43 @@ double Matrix::det(const Matrix& m)
 
 Matrix Matrix::inv(const Matrix& m)
 {
-	return m;
+	if (m.row != m.col) throw std::invalid_argument("Matrix must be square");
+
+	size_t n = m.row;
+
+	double det = determinant(m, n);
+	if (std::abs(det) < 1e-9) throw std::runtime_error("det = 0, there no inverted matrix");
+
+	if (n == 1) {
+		Matrix result(1, 1);
+		result.elements[0][0] = 1.0 / m.elements[0][0];
+		return result;
+	}
+
+	Matrix inverse_m(n, n);
+	Matrix sub_m(n, n);
+
+	for (size_t i = 0; i < n; i++) {
+		for (size_t j = 0; j < n; j++) {
+			size_t sub_i = 0;
+			for (size_t r = 0; r < n; r++) {
+				if (r == i) continue;
+
+				size_t sub_j = 0;
+				for (size_t c = 0; c < n; c++) {
+					if (c == j) continue;
+
+					sub_m.elements[sub_i][sub_j] = m.elements[r][c];
+					sub_j++;
+				}
+				sub_i++;
+			}
+
+			double adj_element = std::pow(-1, i + j) * determinant(sub_m, n - 1);
+			inverse_m.elements[j][i] = adj_element / det;
+		}
+	}
+	return inverse_m;
 }
 
 Matrix Matrix::mult(const Matrix& m1, const Matrix& m2)
@@ -188,7 +225,7 @@ std::ostream& operator<<(std::ostream& out, const Matrix& m)
 	{
 		for (size_t j = 0; j < m.row; j++)
 		{
-			out << std::setw(5) << m.elements[i][j];
+			out << std::setw(12) << m.elements[i][j];
 		}
 		out << std::endl;
 	}
